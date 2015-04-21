@@ -4,14 +4,14 @@ COPYRIGHT (C) 2014 Sandro Maffiodo
 [smaffer@gmail.com](mailto:smaffer@gmail.com)  
 [http://www.assezeta.com/sandromaffiodo](http://www.assezeta.com/sandromaffiodo)
 
-![screenshot0](docs/screenshot0.png)
-<!--
+![screenshot0](docs/screenshot0.jpg)
+
 <center>
 <iframe width="30%" height="200" src="https://www.youtube.com/embed/PfN_sQffLkg" frameborder="0" allowfullscreen></iframe>
 <iframe width="30%" height="200" src="https://www.youtube.com/embed/Yvdf-pfneA4" frameborder="0" allowfullscreen></iframe>
 <iframe width="30%" height="200" src="https://www.youtube.com/embed/W9ebehFDDRA" frameborder="0" allowfullscreen></iframe>
-</center>
--->
+</center> 
+
 ## What's this?
 
 This is a VGA library for Arduino UNO.  
