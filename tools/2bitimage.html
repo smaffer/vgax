@@ -1,0 +1,225 @@
+<script src='jquery.min.js'></script>
+<style type="text/css">
+body, html {
+    background: #eee;
+    color: black;
+    font-family: monospace;
+    font-size: 11px;
+    text-align: center;
+}
+h2 {
+    font-size: 16px;
+}
+h3 {
+    font-size: 13px;
+}
+pre {
+    display: block;
+    margin: 10px;
+}
+#main {
+    background: white;
+    margin: auto;
+    max-width: 520px;
+    text-align: left;
+    padding: 60px 40px;
+}
+#out {
+    font-size: 10px;
+    max-width: 100%;
+    overflow: auto;
+}
+li {
+    margin-bottom: 10px;
+}
+</style>
+<script>
+var ufont_image;
+
+function generate() {
+    if (!ufont_image) {
+        alert("source image not valid");
+        return;
+    }
+    var canvas=document.createElement('canvas');
+    canvas.width=ufont_image.width;
+    canvas.height=ufont_image.height;
+    var ctx=canvas.getContext('2d');
+    ctx.drawImage(ufont_image, 0, 0);
+    var cdata = ctx.getImageData(0, 0, ufont_image.width, ufont_image.height);
+    var data=cdata.data;
+    var ostring="";
+    var sh=parseInt($('#sph').val())
+    var multisprite=sh>0;
+    var spritescount=0;
+    var fmt=$('input[name=outfmt]:checked').val();
+    var singleline=$('#single').is(':checked');
+    var sc=singleline ? ' ' : "\n";
+    if (multisprite) {
+        spritescount++;
+        ostring+="{"+sc;
+    }
+    //convert pixels
+    for (var y=0; y<cdata.height; y++) {
+        var sep=true;
+        var outpixel=0;
+        var pshift=6;
+        if (multisprite && y && !(y%sh)) {
+            spritescount++;
+            ostring+="},\n{"+sc;
+        }
+        ostring+="{ ";
+        for (var x=0; x<cdata.width; x++) {
+            var idx=(x+y*cdata.width) * 4;
+            var r = data[idx + 0];
+            var g = data[idx + 1];
+            var b = data[idx + 2];
+            var pixel=0;
+            switch ($('#colorcomb').val()) {
+            case 'RG':
+                if (r>127 && g>127)
+                    pixel=3;
+                else if (r>127)
+                    pixel=2;
+                else if (g>127)
+                    pixel=1;
+                else
+                    pixel=0;
+                break;
+            case 'GR':
+                if (r>127 && g>127)
+                    pixel=3;
+                else if (g>127)
+                    pixel=2;
+                else if (r>127)
+                    pixel=1;
+                else
+                    pixel=0;
+                break;
+            default:
+                alert("unsupported colour combination");
+                return;
+            }
+            outpixel|=pixel<<pshift;
+            pshift-=2;
+            if (pshift<0) {
+                if (fmt=='bin') {
+                    var os=outpixel.toString(2);
+                    while (os.length<8)
+                        os='0'+os;
+                    ostring+="0b"+os+", ";
+                } else if (fmt=='hex') {
+                    var os=outpixel.toString(16);
+                    if (os.length<2)
+                        os='0'+os;
+                    ostring+="0x"+os+", ";
+                } else {
+                    var os=""+outpixel;
+                    while (os.length<3)
+                        os=" "+os;
+                    ostring+=os+", ";
+                }
+                outpixel=0;
+                pshift=6;
+            }
+        }
+        ostring+="},"+sc;
+    }
+    if (multisprite)
+        ostring+="}\n";
+
+    var imagename=$('#vname').val();
+    var header="//image generated from 2BITIMAGE - by Sandro Maffiodo\n"+
+        "#define IMG_"+imagename.toUpperCase()+"_WIDTH "+cdata.width+"\n"+
+        "#define IMG_"+imagename.toUpperCase()+"_BWIDTH "+(cdata.width/4)+"\n"+
+        "#define IMG_"+imagename.toUpperCase()+"_HEIGHT "+(multisprite ? sh : cdata.height)+"\n"+
+        (multisprite ? "#define IMG_"+imagename.toUpperCase()+"_SPRITES_CNT "+spritescount+"\n" : "")+
+        "//data size="+(cdata.width*cdata.height/4)+" bytes\n"+
+        "const unsigned char img_"+imagename+"_data"+(multisprite ? ("[IMG_"+imagename.toUpperCase()+"_SPRITES_CNT]") : "")+"[IMG_"+imagename.toUpperCase()+"_HEIGHT][IMG_"+imagename.toUpperCase()+"_BWIDTH] PROGMEM={\n";
+    var footer="};\n";
+    $('#out').text(header+ostring+footer);
+}
+function boot() {
+    $('#f').on('change', function(ev) {
+        var f = ev.target.files[0];
+        var fr = new FileReader();
+        fr.onload = function(ev2) {
+            console.dir(ev2);
+            ufont_image=new Image;
+            ufont_image.src=ev2.target.result;
+            $('#preview').attr('src', ev2.target.result);
+            $('#previewbox').show();
+        };
+        fr.readAsDataURL(f);
+    });
+}
+$(document).ready(boot);
+</script>
+<body>
+    <div id='main'>
+        <h2><b>2BITIMAGE</b></h2>
+        by Sandro Maffiodo
+
+        <h3>WHAT IS:</h3>
+        2BITIMAGE is a simple web tool that convert images for the VGAX library. 
+        The VGAX library is a VGA signal generator for AVR. It can display a
+        120x60px framebuffer with 4 colors.<br>
+        <br>
+        <center><img width="100%" src='2bitimage.png'/></center>
+        <br>
+        This tool convert the image FORMAT, by packing 4 pixels in one byte. This
+        tool DONT perform any color conversion, nor any dithering or image resample.
+        <br>
+        VGAX can use 4 colors only, depending on how you wire your VGA DSUB15 connector. See [https://github.com/smaffer/vgax](VGAX on GitHub) for some documentations.
+
+        To use 2BITIMAGE you must select your hardware colour combination. If
+        your colour combination is not present in the list, please let me know.
+
+        <h3>RULES:</h3>
+        <ul>
+            <li>source image must use some (or all) of the four color that you select in the "color combination" dropdown.<br>
+                For example if you select RG your image must use only the RED, GREEN, YELLOW, BLACK colours</li>
+            <li>there is a big tollerance in colors. your pixel values will be rounded to 255. For example if your pixel have RED value > 127 the tool will converts the value to 255 and sets the RED bit to one</li>
+        </ul>
+
+        <h3>OPTIONS:</h3>
+        <ul>
+            <li>you can split your image in multiple sprites using the *sprite height* option</li>
+            <li>*sprites height*, if given, must be the same for all sprites</li>
+            <li>there must be only one sprite for each line (no sprite grid)</li>
+        </ul>
+
+        <h3>INPUT:</h3>
+        source image: <input id="f" type="file" /><br>
+        <div id='previewbox' style='display: none'>
+            <br>
+            <img id='preview' class='dither' style='max-width: 100%'/>
+        </div>
+        <br>
+        color combination: <select id='colorcomb'>
+            <option value='RG'>RG pins (RGYB)</option>
+            <option value='GR'>GR pins (GRYB)</option>
+        </select><br>
+        <BR>
+        output number format:
+        <input value="dec" type="radio" name="outfmt" checked/> decimal
+        <input value="bin" type="radio" name="outfmt" /> binary
+        <input value="hex" type="radio" name="outfmt" /> hexadecimal
+        <br><br>
+        <input id="single" type="checkbox" checked/> generate data as a single line<br>
+        <br>
+        sprite height: <input id="sph" type="number" value="0" /> (zero if there are only one sprite)<br>
+        <br>
+        output variable name:
+        <input value="varname" type='text' id='vname'/>
+
+        <h3>OUTPUT:</h3>
+        <button onclick='generate()'>GENERATE</button>
+        <div id='outpreviewbox' style='display: none'>
+            <br>
+            <img id='outpreview' style='width: 100%'/>
+        </div>
+        <pre id='out'></pre>
+    </div>
+</body>
+

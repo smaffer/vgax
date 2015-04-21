@@ -1,0 +1,188 @@
+<script src='jquery.min.js'></script>
+<style type="text/css">
+body, html {
+    background: #eee;
+    color: black;
+    font-family: monospace;
+    font-size: 11px;
+    text-align: center;
+}
+h2 {
+    font-size: 16px;
+}
+h3 {
+    font-size: 13px;
+}
+#main {
+    background: white;
+    margin: auto;
+    max-width: 520px;
+    text-align: left;
+    padding: 60px 40px;
+}
+#out {
+    font-size: 10px;
+    max-width: 100%;
+    overflow: auto;
+}
+li {
+    margin-bottom: 10px;
+}
+</style>
+<script>
+var ufont_image;
+
+function generate() {
+    if (!ufont_image) {
+        alert("source image not valid");
+        return;
+    }
+    var canvas=document.createElement('canvas');
+    canvas.width=ufont_image.width;
+    canvas.height=ufont_image.height;
+    var ctx=canvas.getContext('2d');
+    ctx.drawImage(ufont_image, 0, 0);
+    var cdata = ctx.getImageData(0, 0, ufont_image.width, ufont_image.height);
+    var data=cdata.data;
+    var glyphs_def=[ { s: 0, e: null } ];
+    //find glyph separators
+    for (var x=0; x<cdata.width; x++) {
+        var sep=true;
+        for (var y=0; y<cdata.height; y++) {
+            var idx=(x+y*cdata.width) * 4;
+            var r = data[idx + 0];
+            var g = data[idx + 1];
+            var b = data[idx + 2];
+            if (!(r==g && g==b && b==255))
+                sep=false;
+        }
+        if (sep) {
+            var last=glyphs_def[glyphs_def.length-1];
+            last.e=x;
+            if (last.e<=last.s) {
+                last.s=x+1;
+            } else {
+                glyphs_def.push({ s: x+1, e: null });
+            }
+        }
+    }
+    var ostring="";
+    var bino=$('#binout').is(':checked');
+    var packed=$('#single').is(':checked');
+    var gcount=0;
+    /*binary dump*/
+    for (var k=0; k!=glyphs_def.length; k++) {
+        var gd=glyphs_def[k];
+        var gdlen=gd.e-gd.s;
+        if (gdlen<0)
+            continue;
+        gcount++;
+        var gstring="{"+(packed ? ' ' : '\n')+gdlen+','+(packed ? ' ' : '\n');
+        for (var y = 0; y < cdata.height; y++) {
+            if (bino)
+                gstring+='0b';
+            var pv=0;
+            var cnt=7;
+            for (var x = gd.s; x < gd.e; x++, cnt--) {
+                var idx = (x + y * cdata.width) * 4;
+                var r = data[idx + 0];
+                var g = data[idx + 1];
+                var b = data[idx + 2];
+                if (!bino) {
+                    if (r==g && g==b && b==0)
+                        pv|=1<<cnt;
+                } else {
+                    if (r==g && g==b && b==0)
+                        gstring+='1';
+                    else
+                        gstring+='0';
+                }
+            }
+            if (bino) {
+                while (cnt-- >=0)
+                    gstring+='0';
+                gstring+=',';
+            } else {
+                gstring+=pv+',';
+            }
+            gstring+=packed ? ' ' : '\n';
+        }
+        var s=String.fromCharCode(k==94 ? 163 : (k+33));
+        var comment="//glyph '"+s+"' code="+k+"\n";
+        gstring+="},";
+        if (packed)
+            ostring+=gstring+'\t'+comment;
+        else
+            ostring+=comment+gstring+'\n';
+    }
+    var fontname=$('#vname').val();
+    var header="//font generated from 2BITFONT - by Sandro Maffiodo\n"+
+        "#define FNT_"+fontname.toUpperCase()+"_HEIGHT "+cdata.height+"\n"+
+        "#define FNT_"+fontname.toUpperCase()+"_SYMBOLS_COUNT "+gcount+"\n"+        
+        "//data size="+(gcount*cdata.height)+" bytes\n"+
+        "const unsigned char fnt_"+fontname+"_data[FNT_"+fontname.toUpperCase()+"_SYMBOLS_COUNT][1+FNT_"+fontname.toUpperCase()+"_HEIGHT] PROGMEM={\n";
+    var footer="};\n";
+    $('#out').text(header+ostring+footer);
+}
+function boot() {
+    $('#f').on('change', function(ev) {
+        var f = ev.target.files[0];
+        var fr = new FileReader();
+        fr.onload = function(ev2) {
+            console.dir(ev2);
+            ufont_image=new Image;
+            ufont_image.src=ev2.target.result;
+            $('#preview').attr('src', ev2.target.result);
+            $('#previewbox').show();
+        };
+        fr.readAsDataURL(f);
+    });
+}
+$(document).ready(boot);
+</script>
+<body>
+    <div id='main'>
+        <h2><b>2BITFONT</b></h2>
+        by Sandro Maffiodo
+
+        <h3>WHAT IS:</h3>
+        2BITFONT is a simple web tool to generate bit fonts for AVR/Arduino. <br>
+        <br>
+        <center><img width="100%" src='2bitfont.png'/></center>
+        <br>
+        2BITFONT read an image where all the fonts glyphs are layouted in a single 
+        line. Each glyph must be separated from the next with a single white line.
+        The tool will autodetect the glyph boundaries and generate a byte table
+        where each byte is 8 horizontal pixels of the glyph. All glyphs will
+        have the same height but different widths. The first byte of the glyph,
+        inside the generated table, is the glyph width (in pixels, where 1pixel=1bit).
+        
+        <h3>RULES:</h3>
+        <ul>
+            <li>source image must have all glyphs on a single line. black is foreground color, white is background</li>
+            <li>the image must contain only the ASCII characters from !(33) to &pound;(128)</li>
+            <li>the height of the font is equal to the height of the source image</li>
+            <li>source image must use a single pixel to delimitate all glyphs (white line separator). <br> When a white line is part of the glyph (for example the glyph ") you can use a red pixel to join the two separated pixels</li>
+            <li>the maximum width of a single glyph must be less or equal 8</li>
+        </ul>
+        
+        <h3>INPUT:</h3>
+        source image: <input id="f" type="file" /><br>
+        <div id='previewbox' style='display: none'>
+            <br>
+            <img id='preview' style='max-width: 100%'/>
+        </div>
+        <br>
+        <input id="single" type="checkbox" checked/> generate one glyph as a single line<br>
+        <br>
+        <input id="binout" type="checkbox" /> use binary numbers (0b0100)<br>
+        <BR>
+        output variable name:
+        <input value="varname" type='text' id='vname'/>
+        
+        <h3>OUTPUT:</h3>
+        <button onclick='generate()'>GENERATE</button>
+        <pre id='out'></pre>
+    </div>
+</body>
+
