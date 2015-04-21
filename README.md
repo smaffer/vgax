@@ -92,7 +92,7 @@ VGAX library generate the video signal using only interrupts, so, inside main() 
 This library uses **all the 3 timers** of ATMega328 MCU.
 
 *TIMER1* and *TIMER2* are configured to generate HSYNC and VSYNC pulses.
-The setup code for these two timers has been [created by Nick Gammon](http://www.gammon.com.au/forum/?id=11608)).
+The setup code for these two timers has been [created by Nick Gammon](http://www.gammon.com.au/forum/?id=11608).
 I have only made some modifications to use pin 9 instead of pin 10.
 
 *TIMER0* is used to fix the interrupt jitter. I have modified an assembler trick
