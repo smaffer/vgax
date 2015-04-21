@@ -54,13 +54,13 @@ ISR(TIMER2_OVF_vect) {
     "      out %[audiopin], r18             \n\t" //c1
     "      st Z, %[freq0]                   \n\t" //c1 afreq=afreq0
     "      rjmp end                         \n\t" //c2
-    //"      mov r16, %[freq0]\n\r"
-    //"      dec r16\n\r"
+    //"    mov r16, %[freq0]\n\r"
+    //"    dec r16\n\r"
     "no_audio:                              \n\t" 
     "      nop                              \n\t" //c1
     "      nop                              \n\t" //c1
     "      nop                              \n\t" //c1
-    //"      nop                              \n\t" //c1
+    //"    nop                              \n\t" //c1
     "      nop                              \n\t" //c1
     "      nop                              \n\t" //c1
     "      nop                              \n\t" //c1
@@ -68,7 +68,7 @@ ISR(TIMER2_OVF_vect) {
     "dont_flip_audio_pin:                   \n\t" 
     "      dec r16                          \n\t" //c1
     "      st Z, r16                        \n\t" //c1
-    //"      nop                              \n\t" //c1
+    //"    nop                              \n\t" //c1
     "end:                                   \n\t"
   :
   : "z" (&afreq),
@@ -264,7 +264,7 @@ void VGAX::noTone() {
 }
 void VGAX::delay(int msec) {
   while (msec--) {
-    unsigned cnt=16000/32;
+    unsigned cnt=16000/32; //TODO: use a more precise way to calculate cnt
     while (cnt--)
       asm volatile("nop\nnop\nnop\nnop\n");
   }
