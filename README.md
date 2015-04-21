@@ -19,9 +19,9 @@ This library require an ATMega328 MCU (or higher) MCU. Does not work with ATTINY
 
 ## Credits
 
-Based on the [VGA color video generation](http://www.gammon.com.au/forum/?id=11608) by [Nick Gammon](TODO).  
-Inspired from the game [Toorums Quest](http://www.gammon.com.au/forum/?id=11608) by [Peten Paja](TODO).  
-AVR [interrupt dejitter](https://github.com/cnlohr/avrcraft/tree/master/terminal) from [Charles CNLOHR](TODO).  
+Based on the [VGA color video generation](http://www.gammon.com.au/forum/?id=11608) by [Nick Gammon](http://www.gammon.com.au).  
+Inspired from the game [Toorums Quest](http://petenpaja.blogspot.fi/2013/11/toorums-quest-ii-retro-video-game.html) by [Peten Paja](http://petenpaja.blogspot.fi).  
+AVR [interrupt dejitter](https://github.com/cnlohr/avrcraft/tree/master/terminal) from [Charles CNLOHR](https://github.com/cnlohr).  
 
 ## Video
 
@@ -96,7 +96,7 @@ The setup code for these two timers has been [created by Nick Gammon](http://www
 I have only made some modifications to use pin 9 instead of pin 10.
 
 *TIMER0* is used to fix the interrupt jitter. I have modified an assembler trick
-originally writen by [Charles CNLOHR](TODO).
+originally writen by [Charles CNLOHR](https://github.com/cnlohr/avrcraft/tree/master/terminal).
 
 By default the *TIMER0* is used by Arduino to implement these functions:
 
