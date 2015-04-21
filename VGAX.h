@@ -14,7 +14,6 @@ inspired from the work of Peten Paja:
   http://petenpaja.blogspot.fi/2013/11/toorums-quest-ii-retro-video-game.html
 AVR interrupt dejitter from Charles CNLOHR:
   https://github.com/cnlohr/avrcraft/tree/master/terminal
-async audio generation inspired from TVOut library
 
 see https://github.com/smaffer/vgax for the library description and for the
 hardware wiring.
