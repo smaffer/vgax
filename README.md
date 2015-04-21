@@ -25,10 +25,10 @@ AVR [interrupt dejitter](https://github.com/cnlohr/avrcraft/tree/master/terminal
 
 ## Video
 
-The library implement a 120x60px framebuffer where each pixel is stored as 2 bits
-(4 colors). The framebuffer is store inside SRAM and require 1800 free bytes. Your program cannot use more than 200 bytes so be carefull. If you want, you can use another Arduino UNO to drive the one that use VGAX library.
+The library implement a 120x60px framebuffer where each pixel is stored as 2 bits (4 colors). 
+The framebuffer is stored inside SRAM and require 1800 bytes. Your programs cannot use more than 200 bytes so be carefull! If you want, you can use another Arduino UNO to drive the one that use VGAX library.
 
-VGAX framebuffer use 2bit for each pixel. Inside each byte are stored 4 pixels, packed in this order: leftmost pixel is in the highest 2bits, rightmost pixel are on the lowest 2bits:
+VGAX framebuffer use 2bit for each pixel. Inside each byte are stored 4 pixels, packed in this order: leftmost pixel is in the highest 2bits, rightmost pixel is  on the lowest 2bits:
 
 ![framebuffer.png](docs/framebuffer.png)
 
@@ -79,15 +79,11 @@ PORTD pins**.
 The vertical synchronization signal is generated on pin 9. Gammon's version use
 the pin 10 but i prefer to keep pins 10 11 12 13 free for common SPI usage.
 
-The VGA signal is generated inside two interrupt functions so the program (main)
-can work and be interrupted by the signal generator in any moment, in a
-transparent manner.
-
 ## Interrupt
 
 VGAX library generate the video signal using only interrupts, so, inside main() function, you can do anything you want. Your code will be interrupted when VGA signal needs to be generated.
 
-[Nick Gammon](http://www.gammon.com.au/forum/?id=11608)'s original code generate the line pixels inside main() function. I prefer to generate the line inside interrupts to keep the MCU free to do some other things, like run games or play sounds.
+[Nick Gammon](http://www.gammon.com.au/forum/?id=11608)'s original code generate the line pixels inside main(). I prefer to generate the line inside interrupts to keep the MCU free to do some other things, like run games or play sounds.
 
 **WARNING: You cannot add other interrupts or the VGA signal generation will be broken.**
 
