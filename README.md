@@ -6,13 +6,12 @@ COPYRIGHT (C) 2014 Sandro Maffiodo
 
 ![screenshot0](docs/screenshot0.jpg)
 
-<center>
-<iframe width="30%" height="200" src="https://www.youtube.com/embed/PfN_sQffLkg" frameborder="0" allowfullscreen></iframe>
-<iframe width="30%" height="200" src="https://www.youtube.com/embed/Yvdf-pfneA4" frameborder="0" allowfullscreen></iframe>
-<iframe width="30%" height="200" src="https://www.youtube.com/embed/W9ebehFDDRA" frameborder="0" allowfullscreen></iframe>
-</center> 
+YouTube videos:
+[0](https://youtu.be/PfN_sQffLkg)
+[1](https://youtu.be/Yvdf-pfneA4)
+[2](https://youtu.be/W9ebehFDDRA)
 
-## What's this?
+## What is VGAX?
 
 This is a VGA library for Arduino UNO.  
 To use this library you need only 4 resistors and one DSUB15 connector.  
