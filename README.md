@@ -4,13 +4,19 @@ COPYRIGHT (C) 2014 Sandro Maffiodo
 [smaffer@gmail.com](mailto:smaffer@gmail.com)  
 [http://www.assezeta.com/sandromaffiodo](http://www.assezeta.com/sandromaffiodo)
 
-![screenshot0](docs/screenshot0.jpg)
+![screenshot0](docs/screenshot3.jpg)
 
 YouTube videos:
 
-[<img src='https://i.ytimg.com/vi/PfN_sQffLkg/mqdefault.jpg'/>](https://youtu.be/PfN_sQffLkg)
-[<img src='https://i.ytimg.com/vi/Yvdf-pfneA4/mqdefault.jpg'/>](https://youtu.be/Yvdf-pfneA4)
-[<img src='https://i.ytimg.com/vi/W9ebehFDDRA/mqdefault.jpg'/>](https://youtu.be/W9ebehFDDRA)
+[<img width='30%' src='https://i.ytimg.com/vi/PfN_sQffLkg/mqdefault.jpg'/>](https://youtu.be/PfN_sQffLkg)
+[<img width='30%' src='https://i.ytimg.com/vi/Yvdf-pfneA4/mqdefault.jpg'/>](https://youtu.be/Yvdf-pfneA4)
+[<img width='30%' src='https://i.ytimg.com/vi/W9ebehFDDRA/mqdefault.jpg'/>](https://youtu.be/W9ebehFDDRA)
+
+Some photos:
+
+[<img width='20%' src='docs/screenshot1.jpg'/>](docs/screenshot1.jpg)
+[<img width='20%' src='docs/screenshot5.jpg'/>](docs/screenshot5.jpg)
+[<img width='20%' src='docs/screenshot2.jpg'/>](docs/screenshot2.jpg)
 
 ## What is VGAX?
 
