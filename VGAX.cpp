@@ -146,7 +146,7 @@ ISR(TIMER2_OVF_vect) {
       "    mul r0, r20      \n\t" //<<4
       "    out %[port], r0  \n\t" //write pixel 3
       "    mul r0, r20      \n\t" //<<6
-      "    out %[port], r0  \n\t" //write pixel 6
+      "    out %[port], r0  \n\t" //write pixel 4
       ".endr                \n\t" //
       "    nop              \n\t" //expand last pixel
       "    ldi r16, 0       \n\t" //
