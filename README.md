@@ -7,9 +7,10 @@ COPYRIGHT (C) 2014 Sandro Maffiodo
 ![screenshot0](docs/screenshot0.jpg)
 
 YouTube videos:
-[0](https://youtu.be/PfN_sQffLkg)
-[1](https://youtu.be/Yvdf-pfneA4)
-[2](https://youtu.be/W9ebehFDDRA)
+
+[<img src='https://i.ytimg.com/vi/PfN_sQffLkg/mqdefault.jpg'/>](https://youtu.be/PfN_sQffLkg)
+[<img src='https://i.ytimg.com/vi/Yvdf-pfneA4/mqdefault.jpg'/>](https://youtu.be/Yvdf-pfneA4)
+[<img src='https://i.ytimg.com/vi/W9ebehFDDRA/mqdefault.jpg'/>](https://youtu.be/W9ebehFDDRA)
 
 ## What is VGAX?
 
@@ -22,6 +23,7 @@ This library require an ATMega328 MCU (or higher) MCU. Does not work with ATTINY
 Based on the [VGA color video generation](http://www.gammon.com.au/forum/?id=11608) by [Nick Gammon](http://www.gammon.com.au).  
 Inspired from the game [Toorums Quest](http://petenpaja.blogspot.fi/2013/11/toorums-quest-ii-retro-video-game.html) by [Peten Paja](http://petenpaja.blogspot.fi).  
 AVR [interrupt dejitter](https://github.com/cnlohr/avrcraft/tree/master/terminal) from [Charles CNLOHR](https://github.com/cnlohr).  
+Thanks to Roberto Melzi [RobCai](https://www.youtube.com/channel/UCgQK0QAMUV5L4OT6y7HsryQ) for developing the first game that uses this library: [Arduino Bomber](https://www.youtube.com/watch?v=dtfNhh6GZ-s). 
 
 ## Video
 
