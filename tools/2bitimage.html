@@ -123,6 +123,26 @@ function generate() {
                 pshift=6;
             }
         }
+        if (pshift!=6) {
+            if (fmt=='bin') {
+                var os=outpixel.toString(2);
+                while (os.length<8)
+                    os='0'+os;
+                ostring+="0b"+os+", ";
+            } else if (fmt=='hex') {
+                var os=outpixel.toString(16);
+                if (os.length<2)
+                    os='0'+os;
+                ostring+="0x"+os+", ";
+            } else {
+                var os=""+outpixel;
+                while (os.length<3)
+                    os=" "+os;
+                ostring+=os+", ";
+            }
+            outpixel=0;
+            pshift=6;
+        }
         ostring+="},"+sc;
     }
     if (multisprite)
@@ -131,10 +151,10 @@ function generate() {
     var imagename=$('#vname').val();
     var header="//image generated from 2BITIMAGE - by Sandro Maffiodo\n"+
         "#define IMG_"+imagename.toUpperCase()+"_WIDTH "+cdata.width+"\n"+
-        "#define IMG_"+imagename.toUpperCase()+"_BWIDTH "+(cdata.width/4)+"\n"+
+        "#define IMG_"+imagename.toUpperCase()+"_BWIDTH "+Math.ceil(cdata.width/4)+"\n"+
         "#define IMG_"+imagename.toUpperCase()+"_HEIGHT "+(multisprite ? sh : cdata.height)+"\n"+
         (multisprite ? "#define IMG_"+imagename.toUpperCase()+"_SPRITES_CNT "+spritescount+"\n" : "")+
-        "//data size="+(cdata.width*cdata.height/4)+" bytes\n"+
+        "//data size="+(Math.ceil(cdata.width/4)*cdata.height)+" bytes\n"+
         "const unsigned char img_"+imagename+"_data"+(multisprite ? ("[IMG_"+imagename.toUpperCase()+"_SPRITES_CNT]") : "")+"[IMG_"+imagename.toUpperCase()+"_HEIGHT][IMG_"+imagename.toUpperCase()+"_BWIDTH] PROGMEM={\n";
     var footer="};\n";
     $('#out').text(header+ostring+footer);
