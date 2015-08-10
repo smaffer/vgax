@@ -248,7 +248,8 @@ void VGAX::fillrect(byte x, byte y, byte width, byte height, byte color) {
   while (rh--) {
     byte rw=width, rx=x;
     while (rw--) {
-      putpixel(rx, y, color);
+      if (rx<VGAX_WIDTH && y<VGAX_HEIGHT)
+        putpixel(rx, y, color);
       rx++;
     }
     y++;
