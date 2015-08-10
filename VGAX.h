@@ -171,40 +171,47 @@ public:
   static void blit8aligned(byte *src, byte sheight, byte dbx, byte dy);
   /*
    * fillrect(x, y, width, height, color)
-   *    x:
-   *    y:
-   *    width:
-   *    height:
-   *    color:
+   *    x: destination x coordinate in pixels
+   *    y: destination y coordinate in pixels
+   *    width: width of the rect in pixels
+   *    height: height of the rect in pixels
+   *    color: color of the rect
    */
   static void fillrect(byte x, byte y, byte width, byte height, byte color);
   /*
    * print(fnt, glyphscount, fntheight, hspace, vspace, str, dx, dy, color)
-   *    fnt:
-   *    glyphscount:
-   *    fntheight:
-   *    hspace:
-   *    vspace:
-   *    str:
-   *    dx:
-   *    dy:
-   *    color:
+   *    fnt: font definition, generated from 2BITFONT tool
+   *    glyphscount: number of symbols inside font definition (generated from
+   *      2bitfont tool)
+   *    fntheight: font height (generated from 2bitfont tool)
+   *    hspace: horizontal space between each printed symbol
+   *    vspace: vertical space between each printed symbol
+   *    str: string to be printed
+   *    dx: destination x coordinate in pixels
+   *    dy: destination y coordinate in pixels
+   *    color: color of the text
    */
   static void print(byte *fnt, byte glyphscount, byte fntheight, byte hspace,
                 byte vspace, const char *str, char dx, char dy, byte color);
+  
+  static void print_SRAM(byte *fnt, byte glyphscount, byte fntheight, 
+                byte hspace, byte vspace, const char *str, char dx, char dy, 
+                byte color);
   /*
    * delay(msec)
-   *    msec:
+   *    msec: number of milliseconds to wait
    */
   static void delay(int msec);
   /*
    * millis()
+   *    return the number of milliseconds ellapsed
    */
   static inline unsigned millis() {
     return vtimer*16;
   }
   /*
    * micros()
+   *    return the number of microseconds ellapsed  
    */
   static inline unsigned long micros() {
     return vtimer*16000;
@@ -219,6 +226,7 @@ public:
   static void tone(unsigned int frequency);
   /*
    * noTone()
+   *     stop the tone generation
    */
   static void noTone();
 };
