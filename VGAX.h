@@ -186,15 +186,19 @@ public:
    *    fntheight: font height (generated from 2bitfont tool)
    *    hspace: horizontal space between each printed symbol
    *    vspace: vertical space between each printed symbol
-   *    str: string to be printed
+   *    str: string to be printed. The string is readed from PROGMEM (FLASH)
    *    dx: destination x coordinate in pixels
    *    dy: destination y coordinate in pixels
    *    color: color of the text
    */
-  static void print(byte *fnt, byte glyphscount, byte fntheight, byte hspace,
-                byte vspace, const char *str, char dx, char dy, byte color);
-  
-  static void print_SRAM(byte *fnt, byte glyphscount, byte fntheight, 
+  static void printPROGMEM(byte *fnt, byte glyphscount, byte fntheight, 
+                byte hspace, byte vspace, const char *str, char dx, char dy, 
+                byte color);
+  /*
+   * printSRAM(...)
+   *    same as printPROGMEM but read from SRAM
+   */
+  static void printSRAM(byte *fnt, byte glyphscount, byte fntheight, 
                 byte hspace, byte vspace, const char *str, char dx, char dy, 
                 byte color);
   /*
