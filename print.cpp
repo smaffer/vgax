@@ -75,8 +75,9 @@
     } \
   }
 
-void VGAX::print(byte *fnt, byte glyphscount, byte fntheight, byte hspace, 
-                 byte vspace, const char *str, char dx, char dy0, byte color) {
+void VGAX::printPROGMEM(byte *fnt, byte glyphscount, byte fntheight, 
+                        byte hspace, byte vspace, const char *str, 
+                        char dx, char dy0, byte color) {
   char dx0=dx, dy;
   char *pstr=(char*)str;
   char c;
@@ -84,9 +85,9 @@ void VGAX::print(byte *fnt, byte glyphscount, byte fntheight, byte hspace,
     PRINT_LOOP_CODE  
   }
 }
-void VGAX::print_SRAM(byte *fnt, byte glyphscount, byte fntheight, byte hspace, 
-                      byte vspace, const char *str, char dx, char dy0, 
-                      byte color) {
+void VGAX::printSRAM(byte *fnt, byte glyphscount, byte fntheight, byte hspace, 
+                     byte vspace, const char *str, char dx, char dy0, 
+                     byte color) {
   char dx0=dx, dy;
   char *pstr=(char*)str;
   char c;
