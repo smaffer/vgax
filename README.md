@@ -418,7 +418,7 @@ The following example use the first font.
       static const char str0[] PROGMEM="VGAX Hello World!";
       vga.begin();
       vga.clear(11);
-      vga.print((byte*)fnt_ufont_data, FNT_UFONT_SYMBOLS_COUNT, FNT_UFONT_HEIGHT, 3, 1, str0, 10, 10, 1);
+      vga.printPROGMEM((byte*)fnt_ufont_data, FNT_UFONT_SYMBOLS_COUNT, FNT_UFONT_HEIGHT, 3, 1, str0, 10, 10, 1);
     }
     void loop() {
     }
