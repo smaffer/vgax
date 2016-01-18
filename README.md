@@ -418,7 +418,7 @@ The following example use the first font.
       static const char str0[] PROGMEM="VGAX Hello World!";
       vga.begin();
       vga.clear(11);
-      vga.print((byte*)fnt_ufont_data, FNT_UFONT_SYMBOLS_COUNT, FNT_UFONT_HEIGHT, 3, 1, str0, 10, 10, 1);
+      vga.printPROGMEM((byte*)fnt_ufont_data, FNT_UFONT_SYMBOLS_COUNT, FNT_UFONT_HEIGHT, 3, 1, str0, 10, 10, 1);
     }
     void loop() {
     }
@@ -467,8 +467,128 @@ With 2bitfont you can create your fonts from a single image and convert them to 
     
 ## FAQ
 
-- How to center the video signal horizontally? At this time i could not able to center horizontally the signal without loosing some pixels or the audio signal generation. You can calibrate the horizontal offset manually, on your monitor or use your monitor auto calibration, if you have it
-- How to center the video signal vertically? You can do it by changing the **RENDERLCOUNT** const inside VGAX.cpp
+- How to center the video signal horizontally?
+
+You must add simply .rept assembler directive inside HSYNC interrupt (VGAX.cpp):
+
+```
+//HSYNC interrupt
+ISR(TIMER2_OVF_vect) {
+  /*
+  NOTE: I prefer to generate the line here, inside the interrupt.
+  Gammon's code generate the line pixels inside main().
+  My versin generate the signal using only interrupts, so inside main() function
+  you can do anything you want. Your code will be interrupted when VGA signal
+  needs to be generated
+  */
+
+  //check vertical porch
+  if (vskip) {
+      vskip--;
+      return;
+  }
+  if (rlinecnt<VGAX_HEIGHT) {   
+    //interrupt jitter fix (needed to keep signal stable)
+    //code from https://github.com/cnlohr/avrcraft/tree/master/terminal
+    //modified from 4 nop align to 8 nop align
+    #define DEJITTER_OFFSET 1
+    #define DEJITTER_SYNC -3
+    asm volatile(
+      "     lds r16, %[timer0]    \n\t" //
+      //"   add r16, %[toffset]   \n\t" //
+      "     subi r16, %[tsync]    \n\t" //
+      "     andi r16, 7           \n\t" //
+      "     call TL               \n\t" //
+      "TL:                        \n\t" //
+      "     pop r31               \n\t" //
+      "     pop r30               \n\t" //
+      "     adiw r30, (LW-TL-5)   \n\t" //
+      "     add r30, r16          \n\t" //
+      //"   adc r31, __zero_reg__ \n\t" //
+      "     ijmp                  \n\t" //
+      "LW:                        \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      "     nop                   \n\t" //
+      //"   nop                   \n\t" //
+      "LBEND:                     \n\t" //
+    :
+    : [timer0] "i" (&TCNT0),
+      [toffset] "i" ((uint8_t)DEJITTER_OFFSET),
+      [tsync] "i" ((uint8_t)DEJITTER_SYNC)
+    : "r30", "r31", "r16", "r17");
+    /*
+    Output all pixels.
+
+    NOTE: My trick here is to unpack 4 pixels and shift them before writing to
+    PORTD.
+
+    Pixels are packed as 0b11223344 because the first pixel write have no time
+    to perform a shift (ld, out) and must be prealigned to the two upper bits 
+    of PORTD, where the two wires of the VGA DSUB are connected. The second, 
+    the third and the forth pixels are shifted left using mul opcode instead 
+    of a left shift opcode. Shift opcodes are slow and can shift only 1 bit at
+    a time, using 1 clock cycle. mul is faster.
+
+    Instead of using a loop i use the .rept assembler directive to generate an 
+    unrolled loop of 30 iterations.
+    */
+    asm volatile (
+      "    ldi r20, 4       \n\t" //const for <<2bit
+      #ifdef VGAX_DEV_DEPRECATED
+      ".rept 14             \n\t" //center line
+      "    nop              \n\t" //
+      ".endr                \n\t" //
+      #endif
+      ".rept 19             \n\t" //center vertically signal
+      "    ldi r16, 0       \n\t"
+      "    out %[port], r16 \n\t"
+      ".endr                \n\t"
+      ".rept 30             \n\t" //output 4 pixels for each iteration
+      "    ld r16, Z+       \n\t" //
+      "    out %[port], r16 \n\t" //write pixel 1
+      "    mul r16, r20     \n\t" //<<2
+      "    out %[port], r0  \n\t" //write pixel 2
+      "    mul r0, r20      \n\t" //<<4
+      "    out %[port], r0  \n\t" //write pixel 3
+      "    mul r0, r20      \n\t" //<<6
+      "    out %[port], r0  \n\t" //write pixel 4
+      ".endr                \n\t" //
+      "    nop              \n\t" //expand last pixel
+      "    ldi r16, 0       \n\t" //
+      "    out %[port], r16 \n\t" //write black for next pixels
+    :
+    : [port] "I" (_SFR_IO_ADDR(PORTD)),
+      "z" "I" (/*rline*/(byte*)vgaxfb + rlinecnt*VGAX_BWIDTH)
+    : "r16", "r17", "r20", "r21", "memory");
+
+    //increment framebuffer line counter after 6 VGA lines
+    if (++aline==5) { 
+      aline=-1;
+      rlinecnt++;
+    } else {
+      #ifdef VGAX_DEV_DEPRECATED
+      //small delay to keep the line signal aligned
+      asm volatile(
+        ".rept 17 \n\t" //
+        "    nop  \n\t" //
+        ".endr    \n\t" //
+      :::);
+      #endif
+    }
+  } 
+}
+```
+
+<b>But there is a problem, if you want to center the video signal horizontally you can't generate audio signal!</b>
+
+You can calibrate the horizontal offset manually, on your monitor or use your monitor auto calibration, if you have it
+
+- How to center the video signal vertically? You can do it by changing the **SKIPLINES** const inside VGAX.cpp
 - How to change the audio pin from **ANALOG0** to another pin? You can change the pin to another analog pin. Modify this line in VGAX.cpp:  
 
 	  pinMode(A0, OUTPUT);
