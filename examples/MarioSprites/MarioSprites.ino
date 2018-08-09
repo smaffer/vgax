@@ -53,26 +53,9 @@ void setup() {
   vga.clear(11);
 }
 void loop() {
-  #if 0
-  int rx=rand() % (VGAX_WIDTH+16) -16;
-  int ry=rand() % (VGAX_HEIGHT+16)-16;
-  vga.blitwmask((byte*)(img_mario_data[0]), (byte*)(img_mariomask_data[0]), IMG_MARIO_WIDTH, IMG_MARIO_HEIGHT, rx, ry);
-  #else
-  #if 1
-  //static byte bpos=120;
   static byte sidx=1;
-  //static byte off=0;
-  //for (int i=0; i!=9; i++) {
-  //  vga.blit((byte*)(img_mario_data[12]), IMG_MARIO_WIDTH, IMG_MARIO_HEIGHT, i*16-off, 44);
-  //}
-  //off=(off+1)%16;
-  //vga.blit((byte*)(img_mario_data[sidx]), IMG_MARIO_WIDTH, IMG_MARIO_HEIGHT, 52, 28);
-  //vga.fillrect(60-IMG_MARIO_WIDTH/2, 29, IMG_MARIO_WIDTH, IMG_MARIO_HEIGHT, 3); 
   vga.blitwmask((byte*)(img_mario_data[sidx]), (byte*)(img_mariomask_data[sidx]), IMG_MARIO_WIDTH, IMG_MARIO_HEIGHT, rand()%VGAX_WIDTH-IMG_MARIO_WIDTH/2, rand()%VGAX_HEIGHT-IMG_MARIO_HEIGHT/2);
-  //vga.delay(10);
   sidx=sidx==1 ? 2 : 1;
-  #endif
-  #endif
   static unsigned cnt;
   if (!(cnt % 5))
     vga.noTone();
@@ -82,7 +65,4 @@ void loop() {
     cnt=0;
     vga.clear(3);
   }
-  //8
-  //9 10
-  //11 12 13
 }

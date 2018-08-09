@@ -16,9 +16,6 @@ Minimum value must be 35 (calculate from Nick Gammon)
 You can modify this value to center the framebuffer vertically, or not*/
 #define SKIPLINES 90
 
-//number of visible lines, after SKIPLINES
-#define RENDERLCOUNT 359
-
 static byte afreq, afreq0;
 unsigned vtimer;
 static byte aline, rlinecnt;
@@ -81,7 +78,7 @@ ISR(TIMER2_OVF_vect) {
       vskip--;
       return;
   }
-  if (rlinecnt<60) {   
+  if (rlinecnt<VGAX_HEIGHT) {   
     //interrupt jitter fix (needed to keep signal stable)
     //code from https://github.com/cnlohr/avrcraft/tree/master/terminal
     //modified from 4 nop align to 8 nop align

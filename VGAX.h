@@ -182,8 +182,8 @@ public:
    * print(fnt, glyphscount, fntheight, hspace, vspace, str, dx, dy, color)
    *    fnt: font definition, generated from 2BITFONT tool
    *    glyphscount: number of symbols inside font definition (generated from
-   *      2bitfont tool)
-   *    fntheight: font height (generated from 2bitfont tool)
+   *      2BITFONT tool)
+   *    fntheight: font height (generated from 2BITFONT tool)
    *    hspace: horizontal space between each printed symbol
    *    vspace: vertical space between each printed symbol
    *    str: string to be printed. The string is readed from PROGMEM (FLASH)
