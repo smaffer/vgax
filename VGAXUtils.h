@@ -3,7 +3,7 @@ Utils for VGAX Library
 
 COPYRIGHT (C) 2014 Sandro Maffiodo
 smaffer@gmail.com
-http://www.assezeta.com/sandromaffiodo
+http://www.sandromaffiodo.com
 
 Some of these methods are from TVOut library created by Myles Metzer (thank you!)
 https://code.google.com/p/arduino-tvout/

@@ -1,26 +1,28 @@
-# VGAX Library for Arduino UNO
+# VGAX Library for Arduino UNO and MEGA
 
 COPYRIGHT (C) 2014 Sandro Maffiodo  
 [smaffer@gmail.com](mailto:smaffer@gmail.com)  
-[http://www.assezeta.com/sandromaffiodo](http://www.assezeta.com/sandromaffiodo)
+[http://www.sandromaffiodo.com](http://www.sandromaffiodo.com)
 
 ![screenshot0](docs/screenshot3.jpg)
 
 YouTube videos:
 
-[<img width='30%' src='https://i.ytimg.com/vi/PfN_sQffLkg/mqdefault.jpg'/>](https://youtu.be/PfN_sQffLkg)
-[<img width='30%' src='https://i.ytimg.com/vi/Yvdf-pfneA4/mqdefault.jpg'/>](https://youtu.be/Yvdf-pfneA4)
-[<img width='30%' src='https://i.ytimg.com/vi/W9ebehFDDRA/mqdefault.jpg'/>](https://youtu.be/W9ebehFDDRA)
+[<img width='20%' src='https://i.ytimg.com/vi/PfN_sQffLkg/mqdefault.jpg'/>](https://youtu.be/PfN_sQffLkg)
+[<img width='20%' src='https://i.ytimg.com/vi/Yvdf-pfneA4/mqdefault.jpg'/>](https://youtu.be/Yvdf-pfneA4)
+[<img width='20%' src='https://i.ytimg.com/vi/W9ebehFDDRA/mqdefault.jpg'/>](https://youtu.be/W9ebehFDDRA)
+[<img width='20%' src='https://i.ytimg.com/vi/Qs3uyhzUcfA/mqdefault.jpg'/>](https://youtu.be/Qs3uyhzUcfA)
 
 Some photos:
 
 [<img width='20%' src='docs/screenshot1.jpg'/>](docs/screenshot1.jpg)
 [<img width='20%' src='docs/screenshot5.jpg'/>](docs/screenshot5.jpg)
 [<img width='20%' src='docs/screenshot2.jpg'/>](docs/screenshot2.jpg)
+[<img width='20%' src='docs/screenshot6.jpg'/>](docs/screenshot6.jpg)
 
 ## What is VGAX?
 
-This is a VGA library for Arduino UNO.  
+This is a VGA library for Arduino UNO and Arduino MEGA.  
 To use this library you need only 4 resistors and one DSUB15 connector.  
 This library require an ATMega328 MCU (or higher) MCU. Does not work with ATTINY family or ATMega168.
 
@@ -33,12 +35,20 @@ Thanks to Roberto Melzi [RobCai](https://www.youtube.com/channel/UCgQK0QAMUV5L4O
 
 ## Video
 
-The library implement a 120x60px framebuffer where each pixel is stored as 2 bits (4 colors). 
-The framebuffer is stored inside SRAM and require 1800 bytes. Your programs cannot use more than 200 bytes so be carefull! If you want, you can use another Arduino UNO to drive the one that use VGAX library.
+The library implement a 120x60px framebuffer where each pixel is stored as 2 bits (4 colors). On Arduino MEGA resolution can be increased to 120x240px.
+The framebuffer is stored inside SRAM and require at least 1800 bytes. This mean that on ATMega328 your programs cannot use more than 200 bytes so be carefull! If you want, you can use another Arduino UNO to drive the one that use VGAX library. On ATMega2560 you have more SRAM but if you expand the framebuffer to 120x240px free SRAM will be 800 bytes.
 
 VGAX framebuffer use 2bit for each pixel. Inside each byte are stored 4 pixels, packed in this order: leftmost pixel is in the highest 2bits, rightmost pixel is  on the lowest 2bits:
 
 ![framebuffer.png](docs/framebuffer.png)
+
+On Arduino MEGA (ATMega2560) framebuffer can be extended to 120x90px with squared pixels or 120x240px with rectangular pixels. You can enable these alternatives resolutions by uncommenting these constants on VGAX.h header:
+
+	//uncomment ATMEGA2560_HIGHRES to use 120x90px squared pixels
+	//#define ATMEGA2560_HIGHRES 
+	
+	//uncomment ATMEGA2560_HIGHRES to use 120x240px rectangular pixels
+	//#define ATMEGA2560_MAXRES
 
 ## Audio
 
@@ -58,11 +68,12 @@ You need:
 Then connect them like the following schema.  
 *NOTE: The DSUB15 connector is shown from rear view*
 
-![wire.png](docs/wire0.png)
+![wire0.png](docs/wire0.png)
+![wire1.png](docs/wire1.png)
 
 ### 4 Colors
 The 4 colors generated from the library are not predefined.  
-You can connect the PIN6 and PIN7 with two of the VGA DSUB15 RGB pins, selecting the color combination that you prefer.
+On Arduino UNO you can connect the pin 6 and pin 7 with two of the VGA DSUB15 RGB pins, selecting the color combination that you prefer.
 
 These are some of the possible combinations, done without additional components:
 
@@ -78,6 +89,7 @@ These are some of the possible combinations, done without additional components:
 
 ![color5.png](docs/color5.png)
 
+Pin 6 and pin 7 on Arduino MEGA must be changed to pin 30 and pin 31 but the same logic of choosing colors can be applyed on MEGA.
 
 ## PIN and PORT
 
@@ -86,6 +98,8 @@ PORTD pins**.
 
 The vertical synchronization signal is generated on pin 9. Gammon's version use
 the pin 10 but i prefer to keep pins 10 11 12 13 free for common SPI usage.
+
+On Arduino MEGA PORTD is substituted to PORTA, vertical sync is pin 11 and horizontal pin is 9.
 
 ## Interrupt
 
@@ -97,11 +111,11 @@ VGAX library generate the video signal using only interrupts, so, inside main() 
 
 ## Timers
 
-This library uses **all the 3 timers** of ATMega328 MCU.
+This library uses **all the 3 timers** of ATMega328 MCU. On ATMega2560 there are more unused timers.
 
 *TIMER1* and *TIMER2* are configured to generate HSYNC and VSYNC pulses.
 The setup code for these two timers has been [created by Nick Gammon](http://www.gammon.com.au/forum/?id=11608).
-I have only made some modifications to use pin 9 instead of pin 10.
+I have only made some modifications to use pin 9 instead of pin 10. On ATMega2560 HSYNC and VSYNC are different.
 
 *TIMER0* is used to fix the interrupt jitter. I have modified an assembler trick
 originally writen by [Charles CNLOHR](https://github.com/cnlohr/avrcraft/tree/master/terminal).

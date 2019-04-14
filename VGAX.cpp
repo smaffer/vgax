@@ -1,20 +1,38 @@
 #include "VGAX.h"
 
 //HSYNC pin used by TIMER2
-#define HSYNCPIN 3
+#if defined(__AVR_ATmega2560__)
+  #define HSYNCPIN 9
+#else
+  #define HSYNCPIN 3
+#endif
 
 //These two pin cannot be modified without modify the HSYNC assembler code
-#define COLORPIN0 6
-#define COLORPIN1 7
+#if defined(__AVR_ATmega2560__)
+  #define COLORPIN0 30
+  #define COLORPIN1 31
+#else
+  #define COLORPIN0 6
+  #define COLORPIN1 7
+#endif
 
 //VSYNC pin used by TIMER1. Can be 9 or 10
-#define VSYNCPIN 9
+#if defined(__AVR_ATmega2560__)
+  #define VSYNCPIN 11
+#else
+  #define VSYNCPIN 9
+#endif
 
 //Number of VGA lines to be skipped (black lines)
 /*These lines includes the vertical sync pulse and back porch.
 Minimum value must be 35 (calculate from Nick Gammon)
 You can modify this value to center the framebuffer vertically, or not*/
-#define SKIPLINES 90
+#if defined(__AVR_ATmega2560__) && \
+(defined(ATMEGA2560_HIGHRES) || defined(ATMEGA2560_MAXRES))
+  #define SKIPLINES 32
+#else
+  #define SKIPLINES 90
+#endif
 
 static byte afreq, afreq0;
 unsigned vtimer;
@@ -83,14 +101,19 @@ ISR(TIMER2_OVF_vect) {
     //code from https://github.com/cnlohr/avrcraft/tree/master/terminal
     //modified from 4 nop align to 8 nop align
     #define DEJITTER_OFFSET 1
-    #define DEJITTER_SYNC -3
+    #define DEJITTER_SYNC -2
     asm volatile(
       "     lds r16, %[timer0]    \n\t" //
-      //"   add r16, %[toffset]   \n\t" //
+      #if defined(__AVR_ATmega2560__)
+      "     add r16, %[toffset]   \n\t" //
+      #endif
       "     subi r16, %[tsync]    \n\t" //
       "     andi r16, 7           \n\t" //
       "     call TL               \n\t" //
       "TL:                        \n\t" //
+      #if defined(__AVR_ATmega2560__)
+      "     pop r17               \n\t" //ATMEGA2560 has a 22bit PC!
+      #endif
       "     pop r31               \n\t" //
       "     pop r30               \n\t" //
       "     adiw r30, (LW-TL-5)   \n\t" //
@@ -149,12 +172,21 @@ ISR(TIMER2_OVF_vect) {
       "    ldi r16, 0       \n\t" //
       "    out %[port], r16 \n\t" //write black for next pixels
     :
+    #if defined(__AVR_ATmega2560__)
+    : [port] "I" (_SFR_IO_ADDR(PORTC)),
+    #else
     : [port] "I" (_SFR_IO_ADDR(PORTD)),
+    #endif
       "z" "I" (/*rline*/(byte*)vgaxfb + rlinecnt*VGAX_BWIDTH)
     : "r16", "r17", "r20", "r21", "memory");
 
     //increment framebuffer line counter after 6 VGA lines
-    if (++aline==5) { 
+    #if defined(__AVR_ATmega2560__) && defined(ATMEGA2560_MAXRES)
+      #define CLONED_LINES (2-1)
+    #else
+      #define CLONED_LINES (6-1)
+    #endif
+    if (++aline==CLONED_LINES) { 
       aline=-1;
       rlinecnt++;
     } else {
@@ -179,20 +211,20 @@ void VGAX::begin(bool enableTone) {
   //disable TIMER0 interrupt
   TIMSK0=0;
   TCCR0A=0;
-  TCCR0B=1; //enable 16MHz counter (used to fix the HSYNC interrupt jitter)
+  TCCR0B=(1 << CS00); //enable 16MHz counter (used to fix the HSYNC interrupt jitter)
   OCR0A=0;
   OCR0B=0;
   TCNT0=0;
   //TIMER1 - vertical sync pulses
   pinMode(VSYNCPIN, OUTPUT);
-  #if VSYNCPIN==10
+  #if VSYNCPIN==10 //ATMEGA328 PIN 10
   TCCR1A=bit(WGM10) | bit(WGM11) | bit(COM1B1);
   TCCR1B=bit(WGM12) | bit(WGM13) | bit(CS12) | bit(CS10); //1024 prescaler
   OCR1A=259; //16666 / 64 uS=260 (less one)
   OCR1B=0; //64 / 64 uS=1 (less one)
   TIFR1=bit(TOV1); //clear overflow flag
   TIMSK1=bit(TOIE1); //interrupt on overflow on TIMER1
-  #else
+  #else //ATMEGA328 PIN 9 or ATMEGA2560 PIN 11
   TCCR1A=bit(WGM11) | bit(COM1A1);
   TCCR1B=bit(WGM12) | bit(WGM13) | bit(CS12) | bit(CS10); //1024 prescaler
   ICR1=259; //16666 / 64 uS=260 (less one)
@@ -229,10 +261,7 @@ void VGAX::clear(byte color) {
   c&=3;
   register byte c0=(c*4) | c;
   c0|=c0*16;
-  unsigned cnt=VGAX_BSIZE;
-  byte *o=(byte*)vgaxfb;
-  while (cnt--)
-    *o++=c0;
+  memset(vgaxfb, c0, VGAX_BSIZE);
 }
 void VGAX::copy(byte *src) {
   byte *o=(byte*)vgaxfb;

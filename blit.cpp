@@ -12,21 +12,14 @@ void VGAX::blit(byte *src, byte swidth, byte sheight, char dx, char dy) {
       byte sw=swidth, sx=0;
       char ldx=dx;
       while (sw--) {
-        /*if ((sx & 3)==0 && (sw & 3)==0) {
-          putpixel4(ldx, dy, pgm_read_byte(srcline + (sx>>2)));
-          sw-=3;
-          sx+=4;
-          ldx+=4;
-        } else*/ {
-          //get sprite pixel
-          byte p=pgm_read_byte(srcline + (sx>>2));
-          byte bitpos=6-(sx & 3)*2;
-          byte spixel=(p >> bitpos);
-          //set framebuffer pixel
-          putpixel(ldx, dy, spixel);
-          sx++;
-          ldx++;
-        }
+        //get sprite pixel
+        byte p=pgm_read_byte(srcline + (sx>>2));
+        byte bitpos=6-(sx & 3)*2;
+        byte spixel=(p >> bitpos);
+        //set framebuffer pixel
+        putpixel(ldx, dy, spixel);
+        sx++;
+        ldx++;
       }
       srcline+=slinesize;
       dy++;

@@ -1,12 +1,12 @@
 /*
-VGAX Library for Arduino UNO (ATMega328 MCU)
+VGAX Library for Arduino UNO (ATMega328) and Arduino MEGA (ATMega2560)
 Source code url: https://github.com/smaffer/vgax
 
 120x60px VGA framebuffer with 4 colors
 
 COPYRIGHT (C) 2014 Sandro Maffiodo
 smaffer@gmail.com
-http://www.assezeta.com/sandromaffiodo
+http://www.sandromaffiodo.com
 
 based on the "VGA color video generation" by Nick Gammon:
   http://www.gammon.com.au/forum/?id=11608.
@@ -28,7 +28,19 @@ HERE you can find some inline documentation about the VGAX library class
 #endif
 #include <avr/pgmspace.h>
 
-#define VGAX_HEIGHT 60 //number of lines
+//uncomment ATMEGA2560_HIGHRES to use 120x90px squared pixels
+//#define ATMEGA2560_HIGHRES 
+
+//uncomment ATMEGA2560_HIGHRES to use 120x240px rectangular pixels
+#define ATMEGA2560_MAXRES
+
+#if defined(ATMEGA2560_MAXRES)
+  #define VGAX_HEIGHT 240 //number of lines
+#elif defined(ATMEGA2560_HIGHRES)
+  #define VGAX_HEIGHT 80 //number of lines
+#else
+  #define VGAX_HEIGHT 60 //number of lines
+#endif
 #define VGAX_BWIDTH 30 //number of bytes in a row
 #define VGAX_WIDTH (VGAX_BWIDTH*4) //number of pixels in a row
 #define VGAX_BSIZE (VGAX_BWIDTH*VGAX_HEIGHT) //size of framebuffer in bytes

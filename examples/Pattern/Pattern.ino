@@ -7,7 +7,7 @@ void setup() {
   vga.clear(11);
   for (int y=0; y!=VGAX_HEIGHT; y++) {
     for (int x=0; x!=VGAX_BWIDTH; x++) {
-      if (x==0)
+      if (x==0 || x==VGAX_BWIDTH-1)
         vga.putpixel(x, y, 3);
       else if (y==0 || y==VGAX_HEIGHT-1)
         vga.putpixel4(x, y, 0xff);
