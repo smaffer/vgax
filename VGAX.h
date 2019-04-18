@@ -34,9 +34,9 @@ HERE you can find some inline documentation about the VGAX library class
 //uncomment ATMEGA2560_HIGHRES to use 120x240px rectangular pixels
 //#define ATMEGA2560_MAXRES
 
-#if defined(ATMEGA2560_MAXRES)
+#if defined(__AVR_ATmega2560__) && defined(ATMEGA2560_MAXRES)
   #define VGAX_HEIGHT 240 //number of lines
-#elif defined(ATMEGA2560_HIGHRES)
+#elif defined(__AVR_ATmega2560__) && defined(ATMEGA2560_HIGHRES)
   #define VGAX_HEIGHT 80 //number of lines
 #else
   #define VGAX_HEIGHT 60 //number of lines
