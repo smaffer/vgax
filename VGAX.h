@@ -31,7 +31,7 @@ HERE you can find some inline documentation about the VGAX library class
 //uncomment ATMEGA2560_HIGHRES to use 120x90px squared pixels
 //#define ATMEGA2560_HIGHRES 
 
-//uncomment ATMEGA2560_HIGHRES to use 120x240px rectangular pixels
+//uncomment ATMEGA2560_MAXRES to use 120x240px rectangular pixels
 #define ATMEGA2560_MAXRES
 
 #if defined(ATMEGA2560_MAXRES)

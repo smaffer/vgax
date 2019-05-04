@@ -33,6 +33,11 @@ Inspired from the game [Toorums Quest](http://petenpaja.blogspot.fi/2013/11/toor
 AVR [interrupt dejitter](https://github.com/cnlohr/avrcraft/tree/master/terminal) from [Charles CNLOHR](https://github.com/cnlohr).  
 Thanks to Roberto Melzi [RobCai](https://www.youtube.com/channel/UCgQK0QAMUV5L4OT6y7HsryQ) for developing the first game that uses this library: [Arduino Bomber](https://www.youtube.com/watch?v=dtfNhh6GZ-s). 
 
+Check out my others Arduino libraries: 
+
+- [ESPVGAX](https://github.com/smaffer/espvgax) a VGA library for ESP8266 that support 512x480px 1bpp framebuffer
+- [VGAXUA](https://github.com/smaffer/vgaxua) a VGAX variant that support 192x80px 1bpp or 200x240px 1bpp on Arduino MEGA!
+
 ## Video
 
 The library implement a 120x60px framebuffer where each pixel is stored as 2 bits (4 colors). On Arduino MEGA resolution can be increased to 120x240px.
@@ -47,7 +52,7 @@ On Arduino MEGA (ATMega2560) framebuffer can be extended to 120x90px with square
 	//uncomment ATMEGA2560_HIGHRES to use 120x90px squared pixels
 	//#define ATMEGA2560_HIGHRES 
 	
-	//uncomment ATMEGA2560_HIGHRES to use 120x240px rectangular pixels
+	//uncomment ATMEGA2560_MAXRES to use 120x240px rectangular pixels
 	//#define ATMEGA2560_MAXRES
 
 ## Audio
