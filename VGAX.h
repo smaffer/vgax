@@ -23,6 +23,8 @@ HERE you can find some inline documentation about the VGAX library class
 #ifndef __VGAX_library__
 #define __VGAX_library__
 
+#define VGAX_VERSION "1.2.0"
+
 #ifdef ARDUINO
 #include <Arduino.h>
 #endif

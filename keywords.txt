@@ -1,0 +1,42 @@
+# Syntax Coloring Map For ExampleLibrary
+
+# Datatypes (KEYWORD1)
+VGAX	KEYWORD1
+VGAXUtils	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+begin	KEYWORD2
+end	KEYWORD2
+putpixel	KEYWORD2
+getpixel	KEYWORD2
+putpixel4	KEYWORD2
+getpixel4	KEYWORD2
+clear	KEYWORD2
+copy	KEYWORD2
+bitblit	KEYWORD2
+blit	KEYWORD2
+blit4	KEYWORD2
+blit8	KEYWORD2
+blitwmask	KEYWORD2
+blit8wmask	KEYWORD2
+blit4aligned	KEYWORD2
+blit8aligned	KEYWORD2
+fillrect	KEYWORD2
+printPROGMEM	KEYWORD2
+printSRAM	KEYWORD2
+delay	KEYWORD2
+millis	KEYWORD2
+micros	KEYWORD2
+tone	KEYWORD2
+noTone	KEYWORD2
+
+# Instances (KEYWORD2)
+vgaxfb	KEYWORD2
+vtimer	KEYWORD2
+
+# Constants (LITERAL1)
+VGAX_HEIGHT	LITERAL1
+VGAX_BWIDTH	LITERAL1
+VGAX_WIDTH	LITERAL1
+VGAX_BSIZE	LITERAL1
+VGAX_SIZE	LITERAL1
