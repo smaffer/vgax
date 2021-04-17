@@ -9,5 +9,5 @@ void setup() {
 void loop() {
   static unsigned cnt;
   cnt++;
-  vga.putpixel(rand()%VGAX_WIDTH, rand()%VGAX_HEIGHT, cnt%3);
+  vga.putpixel(rand()%VGAX_WIDTH, rand()%VGAX_HEIGHT, cnt%4);
 }
