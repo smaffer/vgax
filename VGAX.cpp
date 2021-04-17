@@ -35,7 +35,7 @@ You can modify this value to center the framebuffer vertically, or not*/
 #endif
 
 static byte afreq, afreq0;
-unsigned vtimer;
+unsigned long vtimer;
 static byte aline, rlinecnt;
 static byte vskip;
 byte vgaxfb[VGAX_HEIGHT*VGAX_BWIDTH];

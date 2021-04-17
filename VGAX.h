@@ -52,7 +52,7 @@ HERE you can find some inline documentation about the VGAX library class
 extern byte vgaxfb[VGAX_HEIGHT*VGAX_BWIDTH];
 
 //clock replacement. this is increment in the VSYNC interrupt, so run at 60Hz
-extern unsigned vtimer;
+extern unsigned long vtimer;
 
 //VGAX class. This is a static class. Multiple instances will not work
 class VGAX {
@@ -224,7 +224,7 @@ public:
    * millis()
    *    return the number of milliseconds ellapsed
    */
-  static inline unsigned millis() {
+  static inline unsigned long millis() {
     return vtimer*16;
   }
   /*
