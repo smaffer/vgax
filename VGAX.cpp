@@ -178,7 +178,7 @@ ISR(TIMER2_OVF_vect) {
     : [port] "I" (_SFR_IO_ADDR(PORTD)),
     #endif
       "z" "I" (/*rline*/(byte*)vgaxfb + rlinecnt*VGAX_BWIDTH)
-    : "r16", "r17", "r20", "r21", "memory");
+    : "r16", "r20", "memory");
 
     //increment framebuffer line counter after 6 VGA lines
     #if defined(__AVR_ATmega2560__) && defined(ATMEGA2560_MAXRES)
