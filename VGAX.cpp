@@ -3,17 +3,26 @@
 //HSYNC pin used by TIMER2
 #if defined(__AVR_ATmega2560__)
   #define HSYNCPIN 9
-#else
-  #define HSYNCPIN 3
+#endif
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+	#define HSYNCPIN 3
+#endif
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+  #define HSYNCPIN 5
 #endif
 
 //These two pin cannot be modified without modify the HSYNC assembler code
 #if defined(__AVR_ATmega2560__)
   #define COLORPIN0 30
   #define COLORPIN1 31
-#else
+#endif
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
   #define COLORPIN0 6
   #define COLORPIN1 7
+#endif
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+  #define COLORPIN0 12
+  #define COLORPIN1 6
 #endif
 
 //VSYNC pin used by TIMER1. Can be 9 or 10
@@ -48,7 +57,11 @@ ISR(TIMER1_OVF_vect) {
   rlinecnt=0;
 }
 //HSYNC interrupt
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+ISR(TIMER3_OVF_vect) {
+#else
 ISR(TIMER2_OVF_vect) {
+#endif	
   /*
   NOTE: I prefer to generate the line here, inside the interrupt.
   Gammon's code generate the line pixels inside main().
@@ -65,7 +78,11 @@ ISR(TIMER2_OVF_vect) {
     "      cpi r16, 0                       \n\t" //c1 afreq==0 ?
     "      brne dont_flip_audio_pin         \n\t" //c1/2 *1
     "flip_audio_pin:                        \n\t" 
-    "      ldi r18, 1                       \n\t" //c1
+	#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+    "      ldi r18, 128                     \n\t" //c1
+	#else
+	"      ldi r18, 1                       \n\t" //c1
+	#endif
     "      out %[audiopin], r18             \n\t" //c1
     "      st Z, %[freq0]                   \n\t" //c1 afreq=afreq0
     "      rjmp end                         \n\t" //c2
@@ -88,7 +105,11 @@ ISR(TIMER2_OVF_vect) {
   :
   : "z" (&afreq),
     [freq0] "r" (afreq0),
-    [audiopin] "i" _SFR_IO_ADDR(PINC)
+	#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+		[audiopin] "i" _SFR_IO_ADDR(PINF)
+	#else
+		[audiopin] "i" _SFR_IO_ADDR(PINC)
+	#endif
   : "r16", "r18");
 
   //check vertical porch
@@ -224,7 +245,7 @@ void VGAX::begin(bool enableTone) {
   OCR1B=0; //64 / 64 uS=1 (less one)
   TIFR1=bit(TOV1); //clear overflow flag
   TIMSK1=bit(TOIE1); //interrupt on overflow on TIMER1
-  #else //ATMEGA328 PIN 9 or ATMEGA2560 PIN 11
+  #else //ATMEGA328 & atmega32u4 PIN 9 (OC1A !!) or ATMEGA2560 PIN 11
   TCCR1A=bit(WGM11) | bit(COM1A1);
   TCCR1B=bit(WGM12) | bit(WGM13) | bit(CS12) | bit(CS10); //1024 prescaler
   ICR1=259; //16666 / 64 uS=260 (less one)
@@ -232,6 +253,44 @@ void VGAX::begin(bool enableTone) {
   TIFR1=bit(TOV1); //clear overflow flag
   TIMSK1=bit(TOIE1); //interrupt on overflow on TIMER1
   #endif
+  /*
+
+  */
+  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+  //Timer3 fuer den atmega32u4
+  pinMode(HSYNCPIN, OUTPUT);//Ist hier PC6 also D5 in Ardunino sprache
+  //////////////////
+  // Configure HSYNC
+  //////////////////
+  // WGM3 = 14 -> Fast PWM, up to ICR
+  // COM3A = 3 -> -hsync
+  // COM3B = 0 -> GNDN
+  // COM3C = 0 -> GNDN
+  // CS3 = 1 -> /1
+  //
+  // WGM31:0 = 2 (bottom of 14)
+  TCCR3A = (3 << COM3A0) | (2 << WGM30);
+  // WGM33:2 = 3 (top of 14)
+  TCCR3B = (3 << WGM32);//HSYNC_CLOCK_OFF;
+  // Start counter at 0
+  TCNT3 = 0;
+  // HSYNC clock is 16000000Hz / 1 = 16MHz
+  ICR3 = 511; //32us / 0.0625 uS=512 (less one)//Top-Wert
+  // (357 - 328) * 2.6 ~ 75
+  OCR3A = 63;//4 / 0.0625 uS=64 (less one)
+  // HSYNC + HBackPorch
+  // (392 - 328) * 2.6 ~ 166
+  //OCR3B = 166;//<-- ?? braucht man nicht da COM3B0 = 0 --> disconnected
+  // Listen for the end of the back porch
+  TIFR3 = 0; //clear overflow flag
+  TIMSK3 = (1 << TOIE1);
+  // OC3A => PC6 => pin 5
+  // Start with HSYNC not in progress.
+  // PORTC7 is the LED
+  //PORT_HSYNC = HSYNC_BIT;
+  //DDR_HSYNC = HSYNC_BIT;
+  TCCR3B = ((3 << WGM32) | (1 << CS30));//HSYNC_CLOCK_ON;
+  #else
   //TIMER2 - horizontal sync pulses
   pinMode(HSYNCPIN, OUTPUT);
   TCCR2A=bit(WGM20) | bit(WGM21) | bit(COM2B1); //pin3=COM2B1
@@ -240,6 +299,8 @@ void VGAX::begin(bool enableTone) {
   OCR2B=7; //4 / 0.5 uS=8 (less one)
   TIFR2=bit(TOV2); //clear overflow flag
   TIMSK2=bit(TOIE2); //interrupt on overflow on TIMER2
+  #endif
+  
   //pins for outputting the colour information
   pinMode(COLORPIN0, OUTPUT);
   pinMode(COLORPIN1, OUTPUT);  
@@ -252,9 +313,14 @@ void VGAX::end() {
   //disable TIMER1
   TCCR1A=0;
   TCCR1B=0;
+  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
+  //disable TIMER3
+  TCCR3B=(3 << WGM32);
+  #else
   //disable TIMER2
   TCCR2A=0;
   TCCR2B=0;
+  #endif
 }
 void VGAX::clear(byte color) {
   register byte c=color;
