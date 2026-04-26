@@ -37,6 +37,7 @@ Check out my others Arduino libraries:
 
 - [ESPVGAX](https://github.com/smaffer/espvgax) a VGA library for ESP8266 that support 512x480px 1bpp framebuffer
 - [VGAXUA](https://github.com/smaffer/vgaxua) a VGAX variant that support 192x80px 1bpp or 200x240px 1bpp on Arduino MEGA!
+- [ESPVGAX2](https://github.com/smaffer/espvgax2) VGA signal generation on ESP8266, 320x240px with 16 colors!
 
 ## Video
 
