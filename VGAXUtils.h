@@ -130,6 +130,8 @@ public:
   //porting of TVOut::draw_rect method, writen by Myles Metzer
   static inline void draw_rect(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, 
                                uint8_t c, char fc) {
+    --w;
+    --h;
     if (fc != -1) {
       for (unsigned char i=y0; i < y0+h; i++) {
         VGAXUtils::draw_row(i, x0, x0+w, fc);
@@ -288,6 +290,8 @@ public:
   //Safe version with screen clipping
   static inline void draw_rect_safe(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, 
                                     uint8_t c, char fc) {
+    --w;
+    --h;
     if (fc != -1) {
       for (unsigned char i=y0; i < y0+h; i++) {
         VGAXUtils::draw_row_safe(i, x0, x0+w, fc);

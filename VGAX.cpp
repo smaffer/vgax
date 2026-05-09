@@ -100,41 +100,27 @@ ISR(TIMER2_OVF_vect) {
     //interrupt jitter fix (needed to keep signal stable)
     //code from https://github.com/cnlohr/avrcraft/tree/master/terminal
     //modified from 4 nop align to 8 nop align
-    #define DEJITTER_OFFSET 1
-    #define DEJITTER_SYNC -2
-    asm volatile(
-      "     lds r16, %[timer0]    \n\t" //
-      #if defined(__AVR_ATmega2560__)
-      "     add r16, %[toffset]   \n\t" //
-      #endif
-      "     subi r16, %[tsync]    \n\t" //
-      "     andi r16, 7           \n\t" //
-      "     call TL               \n\t" //
-      "TL:                        \n\t" //
-      #if defined(__AVR_ATmega2560__)
-      "     pop r17               \n\t" //ATMEGA2560 has a 22bit PC!
-      #endif
-      "     pop r31               \n\t" //
-      "     pop r30               \n\t" //
-      "     adiw r30, (LW-TL-5)   \n\t" //
-      "     add r30, r16          \n\t" //
-      //"   adc r31, __zero_reg__ \n\t" //
-      "     ijmp                  \n\t" //
-      "LW:                        \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      "     nop                   \n\t" //
-      //"   nop                   \n\t" //
-      "LBEND:                     \n\t" //
-    :
-    : [timer0] "i" (&TCNT0),
-      [toffset] "i" ((uint8_t)DEJITTER_OFFSET),
-      [tsync] "i" ((uint8_t)DEJITTER_SYNC)
-    : "r30", "r31", "r16", "r17");
+    #define DEJITTER_SYNC 9
+    {
+      uint8_t jitter;
+      asm volatile(
+        "     lds %[jitter], %[timer0]   \n\t" //
+        "     subi %[jitter], %[tsync]   \n\t" //
+        "     andi %[jitter], 7          \n\t" //
+        "     ldi ZL, pm_lo8(NOP_SLIDE)  \n\t" //
+        "     ldi ZH, pm_hi8(NOP_SLIDE)  \n\t" //
+        "     add ZL, %[jitter]          \n\t" //
+        "     adc ZH, __zero_reg__       \n\t" //
+        "     ijmp                       \n\t" //
+        "NOP_SLIDE:                      \n\t" //
+        ".rept 7                         \n\t" //
+        "     nop                        \n\t" //
+        ".endr                           \n\t" //
+      : [jitter] "=d" (jitter)
+      : [timer0] "i" (&TCNT0),
+        [tsync] "i" ((uint8_t)DEJITTER_SYNC)
+      : "r30", "r31");
+    }
     /*
     Output all pixels.
 
@@ -178,7 +164,7 @@ ISR(TIMER2_OVF_vect) {
     : [port] "I" (_SFR_IO_ADDR(PORTD)),
     #endif
       "z" "I" (/*rline*/(byte*)vgaxfb + rlinecnt*VGAX_BWIDTH)
-    : "r16", "r17", "r20", "r21", "memory");
+    : "r16", "r20", "memory");
 
     //increment framebuffer line counter after 6 VGA lines
     #if defined(__AVR_ATmega2560__) && defined(ATMEGA2560_MAXRES)
